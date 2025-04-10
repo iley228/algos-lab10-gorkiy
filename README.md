@@ -84,3 +84,78 @@ _Если ничего не выбрано, код ничего не делае�
 ```python
 listbox.delete(0, tk.END)
 ```
+import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
+
+
+class TodoListApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Мой TODO-лист")
+        self.root.geometry("400x500")  # Фиксированный размер окна
+        self.root.resizable(False, False)  # Запрет изменения размера окна
+
+        self.tasks = []  # Список для хранения задач
+
+        self.create_widgets()
+
+    def create_widgets(self):
+        # Listbox для отображения задач
+        self.task_listbox = tk.Listbox(self.root, width=50, height=15, selectbackground="lightblue", selectmode=tk.SINGLE)
+        self.task_listbox.pack(pady=10, padx=10)
+
+        # Поле ввода для новой задачи
+        self.task_entry = tk.Entry(self.root, width=40)
+        self.task_entry.pack(pady=5, padx=10)
+
+        # Кнопки
+        self.add_button = tk.Button(self.root, text="Добавить", command=self.add_task, width=10)
+        self.add_button.pack(pady=5)
+
+        self.delete_button = tk.Button(self.root, text="Удалить", command=self.delete_task, width=10)
+        self.delete_button.pack(pady=5)
+
+        self.clear_all_button = tk.Button(self.root, text="Очистить всё", command=self.clear_all_tasks, width=10)
+        self.clear_all_button.pack(pady=5)
+
+    def add_task(self):
+        """Добавляет задачу в список."""
+        task_text = self.task_entry.get().strip()  # Получаем текст из поля ввода
+
+        if task_text:
+            self.tasks.append(task_text)
+            self.update_listbox()
+            self.task_entry.delete(0, tk.END)  # Очищаем поле ввода
+        else:
+            messagebox.showwarning("Предупреждение", "Пожалуйста, введите задачу.")
+
+
+    def delete_task(self):
+        """Удаляет выбранную задачу из списка."""
+        try:
+            selected_index = self.task_listbox.curselection()[0]  # Получаем индекс выбранной задачи
+            self.tasks.pop(selected_index)
+            self.update_listbox()
+        except IndexError:
+            messagebox.showwarning("Предупреждение", "Пожалуйста, выберите задачу для удаления.")
+
+
+    def clear_all_tasks(self):
+        """Очищает весь список задач."""
+        if messagebox.askyesno("Подтверждение", "Вы уверены, что хотите очистить весь список?"):
+            self.tasks = []
+            self.update_listbox()
+
+
+    def update_listbox(self):
+        """Обновляет содержимое Listbox."""
+        self.task_listbox.delete(0, tk.END)  # Очищаем Listbox
+        for task in self.tasks:
+            self.task_listbox.insert(tk.END, task)
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = TodoListApp(root)
+    root.mainloop()
